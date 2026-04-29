@@ -90,25 +90,68 @@
  *   // => [pandal1, pandal3] (elements with data-zone="North")
  */
 export function createPandalElement(pandal) {
-  // Your code here
+    if (
+        !pandal ||
+        typeof pandal.name !== "string" ||
+        typeof pandal.zone !== "string" ||
+        typeof pandal.theme !== "string" ||
+        typeof pandal.budget !== "number" ||
+        typeof pandal.rating !== "number"
+    )
+        return null;
+    const el = document.createElement("div");
+    el.className = "pandal";
+    el.dataset.name = pandal.name;
+    el.dataset.zone = pandal.zone;
+    el.dataset.theme = pandal.theme;
+    el.dataset.budget = String(pandal.budget);
+    el.dataset.rating = String(pandal.rating);
+    el.textContent = pandal.name;
+    return el;
 }
 
 export function getPandalInfo(element) {
-  // Your code here
+    if (!element) return null;
+    const ds = element.dataset || {};
+    return {
+        name: ds.name,
+        zone: ds.zone,
+        theme: ds.theme,
+        budget: Number(ds.budget),
+        rating: Number(ds.rating),
+    };
 }
 
 export function updatePandalRating(element, newRating) {
-  // Your code here
+    if (!element) return null;
+    if (typeof newRating !== "number" || newRating < 0 || newRating > 5)
+        return null;
+    const old = Number(element.dataset.rating);
+    element.dataset.rating = String(newRating);
+    return old;
 }
 
 export function filterPandalsByZone(container, zone) {
-  // Your code here
+    if (!container) return [];
+    if (typeof zone !== "string") return [];
+    const nodes = Array.from(container.querySelectorAll(".pandal"));
+    return nodes.filter((n) => n.dataset.zone === zone);
 }
 
 export function getPandalsByBudgetRange(container, min, max) {
-  // Your code here
+    if (!container) return [];
+    if (typeof min !== "number" || typeof max !== "number") return [];
+    const nodes = Array.from(container.querySelectorAll(".pandal"));
+    return nodes.filter((n) => {
+        const b = Number(n.dataset.budget);
+        return !Number.isNaN(b) && b >= min && b <= max;
+    });
 }
 
 export function sortPandalsByRating(container) {
-  // Your code here
+    if (!container) return [];
+    const nodes = Array.from(container.querySelectorAll(".pandal"));
+    nodes.sort((a, b) => Number(b.dataset.rating) - Number(a.dataset.rating));
+    nodes.forEach((n) => container.appendChild(n));
+    return nodes;
 }

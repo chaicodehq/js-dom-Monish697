@@ -65,17 +65,76 @@
  *   // => "cutting" (cheapest chai gets "cheapest" class)
  */
 export function updateChaiPrice(document, chaiType, newPrice) {
-  // Your code here
+    let foundElement = document.getElementById(`price-${chaiType}`);
+    if (
+        typeof chaiType !== "string" ||
+        chaiType.length <= 0 ||
+        typeof newPrice !== "number" ||
+        !Number.isFinite(newPrice) ||
+        newPrice <= 0
+    ) {
+        return false;
+    }
+    if (foundElement) {
+        foundElement.textContent = `₹${newPrice}`;
+        return true;
+    } else return false;
 }
 
 export function getChaiPrice(document, chaiType) {
-  // Your code here
+    let foundElement = document.getElementById(`price-${chaiType}`);
+
+    if (!foundElement) {
+        return null;
+    }
+
+    let res = foundElement.textContent;
+    let temp = res.split("₹");
+
+    res = Number(temp[1]);
+
+    return res;
 }
 
 export function updateStallName(document, newName) {
-  // Your code here
+    let foundElement = document.querySelector(".stall-name");
+
+    if (!foundElement) {
+        return null;
+    }
+
+    let oldName = foundElement.textContent;
+
+    if (!oldName || typeof newName !== "string" || newName.length <= 0) {
+        return null;
+    }
+
+    foundElement.textContent = newName;
+
+    return oldName;
 }
 
 export function highlightCheapestChai(document) {
-  // Your code here
+    let foundElements = document.querySelectorAll(".chai-price");
+    if (!foundElements || foundElements.length <= 0) {
+        return null;
+    }
+
+    let prices = [];
+
+    for (const element of foundElements) {
+        let temp = element.textContent;
+        prices.push(Number(temp.split("₹")[1]));
+    }
+    prices.sort();
+    for (const element of foundElements) {
+        let temp = element.textContent;
+        if (Number(temp.split("₹")[1]) === prices[0]) {
+            element.classList.add("cheapest");
+            let res = element.getAttribute("data-chai");
+            return res;
+        } else {
+            element.classList.remove("cheapest");
+        }
+    }
 }

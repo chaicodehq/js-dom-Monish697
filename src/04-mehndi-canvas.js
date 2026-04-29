@@ -71,22 +71,85 @@
  *   animateElement(el, [{ opacity: "0" }, { opacity: "1" }]);
  *   // => 2 (last frame applied: opacity is now "1")
  */
+
 export function applyBaseStyle(element, color, size) {
-  // Your code here
+    if (!element) {
+        return null;
+    }
+
+    Object.assign(element.style, {
+        backgroundColor: color,
+        width: size + "px",
+        height: size + "px",
+        borderRadius: "50%",
+    });
+    return element;
 }
 
 export function setPatternStyle(element, styles) {
-  // Your code here
+    if (!element) {
+        return -1;
+    }
+    if (
+        !styles ||
+        typeof styles !== "object" ||
+        Object.keys(styles).length <= 0
+    ) {
+        return 0;
+    }
+    Object.assign(element.style, styles);
+
+    return Object.keys(styles).length;
 }
+/*  *   3. getComputedStyles(element, properties)
+ *      - Takes an array of style property names
+ *        e.g., ["backgroundColor", "width", "opacity"]
+ *      - Returns object with those properties and their current values
+ *        from element.style
+ *        e.g., { backgroundColor: "brown", width: "100px", opacity: "0.8" }
+ *      - Agar element null/undefined, return null
+ *      - Agar properties not array, return null */
 
 export function getComputedStyles(element, properties) {
-  // Your code here
+    if (!element || !Array.isArray(properties)) {
+        return null;
+    }
+
+    let res = {};
+    properties.forEach((property) => {
+        res[property] = element.style[property];
+    });
+    return res;
 }
 
 export function toggleVisibility(element) {
-  // Your code here
+    if (!element) {
+        return null;
+    }
+    if (element.style.display === "none") {
+        element.style.display = "";
+        return "";
+    } else {
+        element.style.display = "none";
+        return "none";
+    }
 }
-
+/*
+ *   5. animateElement(element, frames)
+ *      - Takes array of style objects (animation frames)
+ *        e.g., [{ opacity: "0" }, { opacity: "0.5" }, { opacity: "1" }]
+ *      - Simplified version: just applies the LAST frame's styles to element
+ *      - Returns total number of frames
+ *      - Agar element null/undefined, return -1
+ *      - Agar frames not array or empty, return -1  */
 export function animateElement(element, frames) {
-  // Your code here
+    if (!element || !Array.isArray(frames) || frames.length <= 0) {
+        return -1;
+    }
+    const lastFrame = frames[frames.length - 1];
+    for (const property in lastFrame) {
+        element.style[property] = lastFrame[property];
+    }
+
+    return frames.length;
 }

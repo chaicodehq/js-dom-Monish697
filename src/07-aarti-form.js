@@ -84,21 +84,139 @@
  *   // => <div class="booking-summary">...</div>
  */
 export function validateName(name) {
-  // Your code here
+    if (typeof name !== "string")
+        return { valid: false, error: "Naam string hona chahiye" };
+    const trimmed = name.trim();
+    if (trimmed.length < 2)
+        return {
+            valid: false,
+            error: "Naam mein kam se kam 2 characters hone chahiye",
+        };
+    if (trimmed.length > 50)
+        return {
+            valid: false,
+            error: "Naam 50 characters se zyada nahi ho sakta",
+        };
+    if (!/^[A-Za-z\s]+$/.test(trimmed))
+        return {
+            valid: false,
+            error: "Naam mein sirf letters aur spaces allowed hain",
+        };
+    return { valid: true, error: null };
 }
 
 export function validateDate(dateString) {
-  // Your code here
+    if (typeof dateString !== "string")
+        return { valid: false, error: "Date string honi chahiye" };
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString))
+        return {
+            valid: false,
+            error: "Date YYYY-MM-DD format mein honi chahiye",
+        };
+    const parts = dateString.split("-").map(Number);
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    if (Number.isNaN(d.getTime()))
+        return {
+            valid: false,
+            error: "Date YYYY-MM-DD format mein honi chahiye",
+        };
+    // compare only date part
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    d.setHours(0, 0, 0, 0);
+    if (d < today)
+        return { valid: false, error: "Date aaj ya future ki honi chahiye" };
+    return { valid: true, error: null };
 }
 
 export function validateAartiType(type) {
-  // Your code here
+    if (typeof type !== "string")
+        return { valid: false, error: "Aarti type string hona chahiye" };
+    const allowed = ["morning", "evening", "special"];
+    if (!allowed.includes(type))
+        return {
+            valid: false,
+            error: "Aarti type morning, evening, ya special mein se hona chahiye",
+        };
+    return { valid: true, error: null };
 }
 
 export function setupAartiForm(formElement, onSuccess, onError) {
-  // Your code here
+    if (
+        !formElement ||
+        typeof onSuccess !== "function" ||
+        typeof onError !== "function"
+    )
+        return null;
+
+    function submitHandler(e) {
+        e.preventDefault();
+        const name =
+            (formElement.elements &&
+                formElement.elements.name &&
+                formElement.elements.name.value) ||
+            "";
+        const date =
+            (formElement.elements &&
+                formElement.elements.date &&
+                formElement.elements.date.value) ||
+            "";
+        const aartiType =
+            (formElement.elements &&
+                formElement.elements.aartiType &&
+                formElement.elements.aartiType.value) ||
+            "";
+
+        const errors = [];
+        const nRes = validateName(name);
+        if (!nRes.valid) errors.push(nRes.error);
+        const dRes = validateDate(date);
+        if (!dRes.valid) errors.push(dRes.error);
+        const tRes = validateAartiType(aartiType);
+        if (!tRes.valid) errors.push(tRes.error);
+
+        if (errors.length === 0) {
+            onSuccess({ name, date, aartiType });
+        } else {
+            onError(errors);
+        }
+    }
+
+    formElement.addEventListener("submit", submitHandler);
+    return function cleanup() {
+        formElement.removeEventListener("submit", submitHandler);
+    };
 }
 
 export function createBookingSummary(booking) {
-  // Your code here
+    if (
+        !booking ||
+        typeof booking.name !== "string" ||
+        typeof booking.date !== "string" ||
+        typeof booking.aartiType !== "string"
+    )
+        return null;
+    const div = document.createElement("div");
+    div.className = "booking-summary";
+
+    const h3 = document.createElement("h3");
+    h3.textContent = "Booking Confirmation";
+    div.appendChild(h3);
+
+    const pName = document.createElement("p");
+    pName.className = "booking-name";
+    pName.textContent = `Bhakt: ${booking.name}`;
+    div.appendChild(pName);
+
+    const pDate = document.createElement("p");
+    pDate.className = "booking-date";
+    pDate.textContent = `Date: ${booking.date}`;
+    div.appendChild(pDate);
+
+    const pType = document.createElement("p");
+    pType.className = "booking-type";
+    pType.textContent = `Aarti: ${booking.aartiType}`;
+    div.appendChild(pType);
+
+    return div;
 }
